@@ -26,7 +26,8 @@ The calculation to check if device containment is supported is done by checking 
 ## Defender XDR
 ```KQL
 // Paste your query here
-DeviceInfo
+// Gets the onboarded windows devices and checks containment support nuances
+let onboardedWindows = DeviceInfo
 | where OnboardingStatus == "Onboarded" and OSPlatform contains "Windows"
 | distinct DeviceId, DeviceName, ClientVersion, OSPlatform
 | parse ClientVersion with Major:int "." Minor:int "." Build:int "." Revision:int
@@ -51,7 +52,19 @@ DeviceInfo
     Minor >= 8295, "Supported with AH Audit",
     (Minor == 8210 and Build >= 22621 and Revision >= 1016) or Minor > 8210, "Supported without AH Audit",
     "Unsupported"
-)
+);
+// Gets onboarded non-windows devices, since containment is not supported here
+let onboardedNonWindows = DeviceInfo
+| where OnboardingStatus == "Onboarded" and OSPlatform !contains "Windows"
+| distinct DeviceId, DeviceName, ClientVersion, OSPlatform
+| extend Containment = "Unsupported";
+// Get not-onboarded Servers
+let notOnboardedServers = DeviceInfo
+| where OnboardingStatus != "Onboarded" and DeviceType == "Server"
+| distinct DeviceId, DeviceName, ClientVersion, OSPlatform
+| extend Containment = "Unsupported";
+// Union all and show diagram
+union onboardedNonWindows, onboardedWindows, notOnboardedServers
 | summarize count() by Containment
 | render piechart 
 ```

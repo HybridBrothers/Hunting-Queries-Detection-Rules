@@ -14,7 +14,7 @@
 #### Description
 This detection rule tries to flag suspicious logins on devices from service accounts, for which these service accounts did not login into those devices for the last 14 days. This might indicate that the service account is compromised and is being used for lateral movement into the environment.
 
-Most service accounts have a fearly static set of devices they authenticate to. Because of this, it is easier to flag deviations for service accounts compared to user accounts. However, some service accounts are known to dynamically log into devices based on observed events (susch as the MDI service accounts). Because of this some environment specific finetuning might be needed to reduce BP detections.
+Most service accounts have a fairly static set of devices they authenticate to. Because of this, it is easier to flag deviations for service accounts compared to user accounts. However, some service accounts are known to dynamically log into devices based on observed events (susch as the MDI service accounts). Because of this some environment specific finetuning might be needed to reduce BP detections.
 
 #### Risk
 This detections tries to cover the risk of service account compromise being used for lateral movement.

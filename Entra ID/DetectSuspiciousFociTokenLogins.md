@@ -15,9 +15,9 @@ FOCI tokens (Family of Client IDs tokens) are special refresh tokens that allow 
 To detect a suspicious foci token combination, we look for all the logins using foci tokens and group them by Session ID (since these belong to the same session). Then we take the first login where no refresh token was provided, and look at the logins that used refresh tokens as incomming token types within that same session. If the second login application is one that is typically abused by adversaries and the application for the first login is a 'normal' application, we flag the event.
 
 Some organizations have a high BP hit count on Microsoft Azure CLI. To limit those hits, you have three finetune options to enable in the query:
-    - Only alert when first and second login has X time between each other (default 90 minutes if enabled)
-    - Only alert on Microsoft Azure CLI when Global Administrator scope is used in token
-    - Only alert on Microsoft Azure CLI when Global Administrator scope is used in token and request came from a non-compliant device
+- Only alert when first and second login has X time between each other (default 90 minutes if enabled)
+- Only alert on Microsoft Azure CLI when Global Administrator scope is used in token
+- Only alert on Microsoft Azure CLI when Global Administrator scope is used in token and request came from a non-compliant device
 
 #### Risk
 With this detection rule we try to detect suspicious foci token usage.

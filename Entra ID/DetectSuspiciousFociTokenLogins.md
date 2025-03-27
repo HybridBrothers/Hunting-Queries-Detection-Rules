@@ -10,7 +10,7 @@
 | T1606 | Forge Web Credentials | https://attack.mitre.org/techniques/T1606/ |
 
 #### Description
-FOCI tokens (Family of Client IDs tokens) are special refresh tokens that allow multiple applications within the same "family" to share authentication tokens. This means that once a user authenticates with one application, they can access other applications in the same family without needing to re-authenticate. For adversaries, these are very interesting tokens to abuse since they can access a token for a normal application (Microsoft Teams for example), and reuse that access token to access another application (like Azure CLI).
+FOCI tokens (Family of Client IDs tokens) are special refresh tokens that allow multiple applications within the same "family" to share authentication tokens. This means that once a user authenticates with one application, they can access other applications in the same family without needing to re-authenticate. For adversaries, these are very interesting tokens to abuse since they can access a normal application (Microsoft Teams for example), and reuse that refresh token to access another application (like Azure CLI).
 
 To detect a suspicious foci token combination, we look for all the logins using foci tokens and group them by Session ID (since these belong to the same session). Then we take the first login where no refresh token was provided, and look at the logins that used refresh tokens as incomming token types within that same session. If the second login application is one that is typically abused by adversaries and the application for the first login is a 'normal' application, we flag the event.
 

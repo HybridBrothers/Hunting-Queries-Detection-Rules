@@ -1,4 +1,4 @@
-# *Detect Suspicious ncrypt.dll usage with RDP connections to unmanaged or non TPM protected device*
+# *Detect Suspicious ncrypt.dll usage on admin device with RDP connections to non TPM protected device*
 
 ## Query Information
 
@@ -11,7 +11,7 @@
 | T1021.001 | Remote Services: Remote Desktop Protocol | https://attack.mitre.org/techniques/T1021/001/ |
 
 #### Description
-This detection rule uses a WDAC audit policy to ingest missing DeviceImageLoad events in MDE, and check for suspicious processes using the ncrypt.dll and devices performing RDP connection to unmanaged or non-TPM devices. More information on the attack scenario this is detection is applicable for can be found in the references.
+This detection rule uses a WDAC audit policy to ingest missing DeviceImageLoad events in MDE, and check for suspicious processes using the ncrypt.dll and admin devices performing RDP connection to unmanaged or non-TPM devices. More information on the attack scenario this is detection is applicable for can be found in the references.
 
 #### Risk
 By using this detections, we can try to detect an attacker using the hellopoc.ps1 script in RoadTools to generate an assertion, and export the Windows Hello for Business keys using an RDP session. 
@@ -29,9 +29,24 @@ By using this detections, we can try to detect an attacker using the hellopoc.ps
 
 ## Defender XDR
 ```KQL
-let cli_tools = dynamic(["powershell", "python"]);
-// Get suspicious ncrypt.dll usage via WDAC audit policy
-let time_lookback = 1h;
+let time_lookback = 30d;
+let admin_users = toscalar(
+    IdentityInfo
+    | where Timestamp > ago(7d)
+    | where CriticalityLevel != "" or AccountDisplayName contains "Admin"
+    | summarize make_set(AccountDisplayName)
+);
+let devices_with_admin_accounts = (
+    ExposureGraphEdges
+    // Get edges where source is a device and destination is a admin user
+    | where SourceNodeLabel == "device" and TargetNodeLabel == "user"
+    | where TargetNodeName in (admin_users)
+    // Check which devices have the credentials of the admin user
+    | make-graph SourceNodeId --> TargetNodeId with ExposureGraphNodes on NodeId
+    | graph-match (SourceNode)-[hasCredentialsOf]->(TargetNode)
+        project IncomingNodeName = SourceNode.NodeName, OutgoingNodeName = TargetNode.NodeName, CriticalityLevel = TargetNode.NodeProperties.rawData.criticalityLevel.criticalityLevel, CriticalityRuleNames = TargetNode.NodeProperties.rawData.criticalityLevel.ruleNames
+    | summarize make_set(IncomingNodeName)
+);
 let no_tpm_devices = (
     ExposureGraphNodes
     // Get device nodes with their inventory ID
@@ -67,6 +82,8 @@ let no_tpm_device_info = (
 let dangerous_rdp_sessions = (
     DeviceNetworkEvents
     | where Timestamp > ago(time_lookback)
+    // Only flag admin devices
+    | where DeviceName in (devices_with_admin_accounts)
     // Exclude MDI RDP Connections (known for NNR)
     | where InitiatingProcessFileName !~ "microsoft.tri.sensor.exe"
     // Search for RDP connections to non-tpm devices
@@ -95,6 +112,8 @@ let nonce_requests = (
 // Get suspicious ncrypt.dll usage via WDAC audit policy
 DeviceEvents
 | where Timestamp > ago(time_lookback)
+// Only flag admin devices
+| where DeviceName in (devices_with_admin_accounts)
 | where ActionType startswith "AppControl" and FileName =~ "ncrypt.dll"
 // Check if the same initiating process is doing a nonce request
 | join kind=inner nonce_requests on InitiatingProcessId, DeviceId
@@ -114,7 +133,24 @@ DeviceEvents
 
 ## Sentinel
 ```KQL
-let time_lookback = 1h;
+let time_lookback = 30d;
+let admin_users = toscalar(
+    IdentityInfo
+    | where TimeGenerated > ago(7d)
+    | where CriticalityLevel != "" or AccountDisplayName contains "Admin"
+    | summarize make_set(AccountDisplayName)
+);
+let devices_with_admin_accounts = (
+    ExposureGraphEdges
+    // Get edges where source is a device and destination is a admin user
+    | where SourceNodeLabel == "device" and TargetNodeLabel == "user"
+    | where TargetNodeName in (admin_users)
+    // Check which devices have the credentials of the admin user
+    | make-graph SourceNodeId --> TargetNodeId with ExposureGraphNodes on NodeId
+    | graph-match (SourceNode)-[hasCredentialsOf]->(TargetNode)
+        project IncomingNodeName = SourceNode.NodeName, OutgoingNodeName = TargetNode.NodeName, CriticalityLevel = TargetNode.NodeProperties.rawData.criticalityLevel.criticalityLevel, CriticalityRuleNames = TargetNode.NodeProperties.rawData.criticalityLevel.ruleNames
+    | summarize make_set(IncomingNodeName)
+);
 let no_tpm_devices = (
     ExposureGraphNodes
     // Get device nodes with their inventory ID
@@ -150,6 +186,8 @@ let no_tpm_device_info = (
 let dangerous_rdp_sessions = (
     DeviceNetworkEvents
     | where TimeGenerated > ago(time_lookback)
+    // Only flag admin devices
+    | where DeviceName in (devices_with_admin_accounts)
     // Exclude MDI RDP Connections (known for NNR)
     | where InitiatingProcessFileName !~ "microsoft.tri.sensor.exe"
     // Search for RDP connections to non-tpm devices
@@ -178,6 +216,8 @@ let nonce_requests = (
 // Get suspicious ncrypt.dll usage via WDAC audit policy
 DeviceEvents
 | where TimeGenerated > ago(time_lookback)
+// Only flag admin devices
+| where DeviceName in (devices_with_admin_accounts)
 | where ActionType startswith "AppControl" and FileName =~ "ncrypt.dll"
 // Check if the same initiating process is doing a nonce request
 | join kind=inner nonce_requests on InitiatingProcessId, DeviceId
@@ -189,7 +229,7 @@ DeviceEvents
 | where InitiatingProcessFileName !in ("backgroundtaskhost.exe","svchost.exe")
 // Project interesting columns
 | extend WdacPolicyName = parse_json(AdditionalFields)["PolicyName"]
-| project Timestamp, DeviceName, ActionType, FileName, InitiatingProcessSHA1, InitiatingProcessFileName, 
+| project TimeGenerated, DeviceName, ActionType, FileName, InitiatingProcessSHA1, InitiatingProcessFileName, 
     InitiatingProcessId, InitiatingProcessAccountName, InitiatingProcessParentFileName, WdacPolicyName, InitiatingProcessRemoteSessionDeviceName, InitiatingProcessRemoteSessionIP,
     NonceRequestTimestamp, RdpTimeGenerated, RdpInitiatingProcessFileName, RdpRemoteDeviceName, RdpRemoteMacAddress, RdpRemoteDeviceOnboardingStatus,
     RdpRemoteDeviceTpmActivated, RdpRemoteDeviceTpmEnabled, RdpRemoteDeviceTpmSupported

@@ -1,4 +1,4 @@
-# *Detect suspicious foci token logins*
+# *Detect suspicious foci token logins V2*
 
 ## Query Information
 
@@ -14,7 +14,7 @@ FOCI tokens (Family of Client IDs tokens) are special refresh tokens that allow 
 
 To detect a suspicious foci token combination, we look for all the logins using foci tokens and group them by Session ID (since these belong to the same session). Then we take the first login where no refresh token was provided, and look at the logins that used refresh tokens as incomming token types within that same session. If the second login application is one that is typically abused by adversaries and the application for the first login is a 'normal' application, we flag the event.
 
-We added a second version for this query in this repo, to also flag when an adversary is using the same application to get new access tokens but with another scope. The v2 version focusses more on RoadTool detection tho, while this detection is more broad.
+This version is the V2 version for this query in this repo, which also flags when an adversary is using the same application to get new access tokens but with another scope (compared to V1 which does not do this). The v2 version focusses more on RoadTool detection tho, while the v1 detection is more broad.
 
 Some organizations have a high BP hit count on Microsoft Azure CLI. To limit those hits, you have three finetune options to enable in the query:
 - Only alert when first and second login has X time between each other (default 90 minutes if enabled)
@@ -67,11 +67,11 @@ FociTokenRequest
         SecondAppId = AppId
     )
     on SessionId, UserPrincipalName
-// Exclude when First App ID and Second are the same
-| where AppDisplayName != SecondAppDisplayName
+| extend FirstOauthScopeInfo = extract("{\"key\":\"Oauth Scope Info\",\"value\":\"\\[(.*)\\]\"}", 1, AuthenticationProcessingDetails),
+    SecondOauthScopeInfo = extract("{\"key\":\"Oauth Scope Info\",\"value\":\"\\[(.*)\\]\"}", 1, AuthenticationProcessingDetails1)
 // Only get requests where refresh token was used after first sign-in
 | extend TimeDiff = datetime_diff('minute', SecondRequestTimeGenerated, TimeGenerated)
-| where TimeDiff >= 0 //and TimeDiff <= maxTimeDiff // Remove from comment you want to apply time difference restriction
+| where TimeDiff >= 1 and TimeDiff <= maxTimeDiff
 // Only project needed columns
 | project
     FirstRequestTimeGenerated = TimeGenerated,
@@ -95,10 +95,13 @@ FociTokenRequest
     SeconIncomingTokenType = IncomingTokenType1,
     SessionId,
     TimeDiff,
-    AuthenticationProcessingDetails,
-    SecondAuthenticationProcessingDetails = AuthenticationProcessingDetails1
-// Flag logins to the following applications as second login (since they are very popular for attackers and we rather not see logins to these via foci tokens)
-| where SecondAppDisplayName in ("Microsoft Azure CLI", "Microsoft Azure PowerShell", "Office 365 Management")
+    FirstOauthScopeInfo,
+    SecondOauthScopeInfo,
+    FirstResourceIdentity = ResourceIdentity,
+    SecondResourceIdentity = ResourceIdentity1
+// Flag logins to the following applications as second login, since these are the most popular used for RoadTools (fico apps, localhost redirect URI, and Azure AD resource identity)
+| where SecondAppDisplayName in ("Microsoft Azure CLI", "Copilot App", "Microsoft Azure PowerShell", "Visual Studio - Legacy", "Microsoft Edge Enterprise New Tab Page") and SecondResourceIdentity == "00000002-0000-0000-c000-000000000000"
+| where SecondResult == 0
 // ENVIRONMENT SPECIFIC FINETUNING - BEGIN
 // Most BP triggers are mainly on Microsoft Azure CLI, so we provide two ways of handling these BP detections (strongly depends on environment)
 // OPTION 1 - Flag login to Azure CLI using 'Global Administrator' ID in token scope

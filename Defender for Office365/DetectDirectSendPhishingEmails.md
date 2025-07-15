@@ -9,7 +9,8 @@
 | T1566 | Phishing | https://attack.mitre.org/techniques/T1566/ |
 
 #### Description
-In May 2025, a campain started using the Microsoft Direct Send feature to send phishing mails to organizations. This feature is designed for use by printers, scanners, cloud services and other devices that need to send messages on behalf of the company. This detection rule tries to detect the malicious mails being send via Direct Send using a couple of indicators:
+In May 2025, a campaign started using the Microsoft Exchange Direct Send feature to send phishing mails to organizations. This feature is designed for use by printers, scanners, cloud services and other devices that need to send messages on behalf of the company. This detection rule tries to detect the malicious mails being send via Direct Send using a couple of indicators:
+
     - Sender email is the same as Recipient email
     - SPF and DMARC both failed
     - Mail is not comming in via an Exchange connector

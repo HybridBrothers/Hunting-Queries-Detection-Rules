@@ -11,10 +11,10 @@
 #### Description
 In most organizations normal user accounts or accounts with low risk permissions have less security controls enabled. This because there are less security controls needed in order to minize the risk vectors that come with these accounts. If these accounts are used on devices where critical account credentials are also present, the critical user account can be compromised more easily when the device is accessed by an adversary via the non-critical user account. 
 
-Because of this, a Privileged Access Workstation should be used which serves as a dedicated workstation for the critical accounts. By doing this, the critical user account cannot be comprmised via a unhardened device.
+Because of this, a Privileged Access Workstation should be used which serves as a dedicated workstation for the critical accounts. By doing this, the critical user account cannot be compromised via a unhardened device.
 
 #### Risk
-When you know which devices are exposing critical credentials via access from non-critical accounts, you know which devices have the most risk to all for privilege escalation.
+When you know which devices are exposing critical credentials via access from non-critical accounts, you know which devices have the most risk to allow for privilege escalation.
 
 #### Author <Optional>
 - **Name:** Robbe Van den Daele

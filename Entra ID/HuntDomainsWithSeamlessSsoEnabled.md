@@ -24,6 +24,8 @@ See reference for impacted scenario's.
 #### References
 - https://nathanmcnulty.com/blog/2025/08/finding-seamless-sso-usage/#
 - https://ourcloudnetwork.com/why-you-should-disable-seamless-sso-in-microsoft-entra-connect/
+- https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/how-to-connect-sso-faq#how-can-i-disable-seamless-sso-
+- https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/how-to-connect-sso
 
 ## Defender XDR
 ```KQL

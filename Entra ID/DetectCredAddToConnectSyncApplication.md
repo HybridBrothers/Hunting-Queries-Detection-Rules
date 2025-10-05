@@ -37,7 +37,7 @@ let base = materialize (
     | extend AppName = tostring(TargetResources[0].displayName)
     | where AppName startswith "ConnectSyncProvisioning_"
     // Only get cretificate or secret changes
-    | where OperationName contains "Update application – Certificates and secrets management"
+    | where OperationName has_any ("Add service principal", "Certificates and secrets management", "Update application")
     // Expand the target resources and modified properties, and only use events ralted to KeyDescription
     | mv-expand TargetResources
     | extend ModifiedProperties = TargetResources.modifiedProperties
@@ -79,7 +79,7 @@ let base = materialize (
     | extend AppName = tostring(TargetResources[0].displayName)
     | where AppName startswith "ConnectSyncProvisioning_"
     // Only get cretificate or secret changes
-    | where OperationName contains "Update application – Certificates and secrets management"
+    | where OperationName has_any ("Add service principal", "Certificates and secrets management", "Update application")
     // Expand the target resources and modified properties, and only use events ralted to KeyDescription
     | mv-expand TargetResources
     | extend ModifiedProperties = TargetResources.modifiedProperties

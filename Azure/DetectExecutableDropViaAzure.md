@@ -1,4 +1,4 @@
-# *Detect executable drops via Azure ARC custom script extension*
+# *Detect executable drops via Azure custom script extension*
 
 ## Query Information
 
@@ -11,10 +11,10 @@
 
 
 #### Description
-This detection rule flags when the Azure Arc service on a machine is dropping executable files. This might indicate that an actor is trying to drop malware or beacons via a compromised cloud admin account. In the most legitimate cases administrators are pushing only PowerShell or Shell scripts, although these can also contain malicious content. Be aware of this gap in the below detection rule. 
+This detection rule flags when the Custom Script extension service on a machine is dropping executable files. This might indicate that an actor is trying to drop malware or beacons via a compromised cloud admin account. In the most legitimate cases administrators are pushing only PowerShell or Shell scripts, although these can also contain malicious content. Be aware of this gap in the below detection rule. 
 
 #### Risk
-This rule triest to mitigate the risk of malicious actors trying to deploy malware or beacons via Azure Arc.
+This rule triest to mitigate the risk of malicious actors trying to deploy malware or beacons via Azure or Azure Arc Custom Script extensions.
 
 #### Author <Optional>
 - **Name:** Robbe Van den Daele
@@ -30,7 +30,6 @@ This rule triest to mitigate the risk of malicious actors trying to deploy malwa
 ```kql
 // Executable extensions we want to flag (you can also add .ps1 and .sh)
 let win_executable_extensions = dynamic([".dll", ".exe", ".msi", ".bat", ".cmd", ".com", ".vbs", ".wsf", ".scr", ".cpl"]);
-let linux_executable_extensions = dynamic([".bin", ".run", ".py", ".pl", ".out", ".appimage", ".deb", ".rpm"]);
 DeviceFileEvents
 | where TimeGenerated > ago(1h)
 // Search for file created events by Arc Custom Script Handler
@@ -40,6 +39,5 @@ DeviceFileEvents
 | extend FileType = tostring(parse_json(AdditionalFields).FileType)
 // Flag on extension or executable file type
 | where FileName has_any (win_executable_extensions) or 
-    FileName has_any (linux_executable_extensions) or 
     FileType contains "Executable"
 ```

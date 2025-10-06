@@ -1,4 +1,4 @@
-# *Detect first time Arc Custom Script or Run Command deployment*
+# *Detect first time Azure Custom Script or Run Command deployment*
 
 ## Query Information
 
@@ -11,10 +11,10 @@
 
 
 #### Description
-This detection rule flags using UEBA of Defender XDR and Microsoft Sentinel if it is the first time that an account is deploying Custom Scripts or Run Commands on Azure Arc machines. Since UEBA uses a baseline of 180 days, it might indicate that an account is being abused to compormise Azure Arc machines.  
+This detection rule flags using UEBA of Defender XDR and Microsoft Sentinel if it is the first time that an account is deploying Custom Scripts or Run Commands on Azure and Azure Arc machines. Since UEBA uses a baseline of 180 days, it might indicate that an account is being abused to compormise Azure or Azure Arc machines.  
 
 #### Risk
-This rule tries to mitigate the risk of cloud admin accounts being abused to compromised Azure Arc machines while Custom Scripts or Run Commands are not really used in the environment.
+This rule tries to mitigate the risk of cloud admin accounts being abused to compromised Azure or Azure Arc machines while Custom Scripts or Run Commands are not really used in the environment.
 
 #### Author <Optional>
 - **Name:** Robbe Van den Daele

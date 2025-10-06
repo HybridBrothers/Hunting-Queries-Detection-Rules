@@ -1,4 +1,4 @@
-# *Detect Arc Custom Script or Run Command deployment by risky user*
+# *Detect Custom Script or Run Command deployment by risky user*
 
 ## Query Information
 
@@ -11,10 +11,10 @@
 
 
 #### Description
-This detection rule flags when a User with risk events in Entra ID Identity Protection is deploying Custom Scripts or Run Commands on Azure Arc machines. This may indicate a compromised cloud user that is now performaring lateral movement from the Azure control plane to Virtual Machines in other environments. 
+This detection rule flags when a user with risk events in Entra ID Identity Protection is deploying Custom Scripts or Run Commands on Azure or Azure Arc machines. This may indicate a compromised cloud user that is now performaring lateral movement from the Azure control plane to Virtual Machines in other environments. 
 
 #### Risk
-This rule tries to mitigate the risk of compromised cloud admin accounts performing lateral movement via Azure Arc.
+This rule tries to mitigate the risk of compromised cloud admin accounts performing lateral movement via Azure or Azure Arc Custom Script or Run Command deployments.
 
 #### Author <Optional>
 - **Name:** Robbe Van den Daele

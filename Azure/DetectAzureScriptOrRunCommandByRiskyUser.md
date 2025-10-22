@@ -37,3 +37,6 @@ AzureActivity
 | summarize make_list(ActivityStatusValue), TimeGenerated = max(TimeGenerated) by CorrelationId, CallerIpAddress, Caller, ResourceGroup, VMName
 | join kind=inner (AADUserRiskEvents | where TimeGenerated > ago(14d) ) on $left.Caller == $right.UserPrincipalName
 ```
+
+> [!NOTE]
+> You can also use the `CloudAppEvents` table with `Applicationid` `12260` and `ActionType` `Write Extensions`

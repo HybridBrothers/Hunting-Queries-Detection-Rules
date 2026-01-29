@@ -10,7 +10,7 @@
 
 
 #### Description
-This query searches for accounts where Exposure Management detected leaked credentials. This query is correlated with the `IdentityInfo` table, mainly because you can easily created a detection of this rule if you would like to.
+This query searches for accounts where Exposure Management detected leaked credentials. This query is correlated with the `IdentityInfo` table, mainly because you can easily create a detection of this rule if you would like to.
 
 
 #### Risk

@@ -6,11 +6,13 @@
 
 | Technique ID | Title    | Link    |
 | ---  | --- | --- |
+| T1566.002 | Phishing: Spearphishing Link | https://attack.mitre.org/techniques/T1566/002/ |
 
 #### Description
+An external sender suddenly sending the same link to multiple internal users, can indicate that external user being compromised and used for BEC Attacks. In these kind of attacks compromised accounts are used to send phishing links or attachments to users in business relationships.
 
 #### Risk
-
+When the external user is sending the same link to multiple internal users at a small time frame, the related link might be malicious.
 
 #### Author <Optional>
 - **Name:** Robbe Van den Daele
@@ -20,7 +22,8 @@
 - **Website:** https://hybridbrothers.com/
 
 #### References
-
+- https://hybridbrothers.com
+- https://thecollective.eu
 
 ## Defender XDR
 ```KQL

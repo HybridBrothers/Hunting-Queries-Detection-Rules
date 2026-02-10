@@ -6,11 +6,14 @@
 
 | Technique ID | Title    | Link    |
 | ---  | --- | --- |
+| T1204.001 | User Execution: Malicious Link | https://attack.mitre.org/techniques/T1204/001/ |
+| T1566.002 | Phishing: Spearphishing Link | https://attack.mitre.org/techniques/T1566/002/ |
 
 #### Description
+This detection rule detects Microsoft Teams messages where MDO detected a threat in the message.
 
 #### Risk
-
+Malicious messages being send to users can be the beginning of an Initial Access.
 
 #### Author <Optional>
 - **Name:** Robbe Van den Daele
@@ -20,7 +23,8 @@
 - **Website:** https://hybridbrothers.com/
 
 #### References
-
+- https://hybridbrothers.com
+- https://thecollective.eu
 
 ## Defender XDR
 ```KQL

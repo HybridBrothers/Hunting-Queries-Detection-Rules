@@ -6,11 +6,13 @@
 
 | Technique ID | Title    | Link    |
 | ---  | --- | --- |
+| T1566 | Phishing | https://attack.mitre.org/techniques/T1566/ |
 
 #### Description
+An external sender suddenly increasing the amount of internal users they are sending messages to, can indicate that external user being compromised and used for BEC Attacks. In these kind of attacks compromised accounts are used to send phishing links or attachments to users in business relationships.
 
 #### Risk
-
+When the external user is sending a lot of messages to different internal users at a small time frame, these messages might be malicious.
 
 #### Author <Optional>
 - **Name:** Robbe Van den Daele
@@ -20,7 +22,8 @@
 - **Website:** https://hybridbrothers.com/
 
 #### References
-
+- https://hybridbrothers.com
+- https://thecollective.eu
 
 ## Defender XDR
 ```KQL

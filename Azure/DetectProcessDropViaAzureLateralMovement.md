@@ -1,4 +1,4 @@
-# *Detect process drops via Azure Custom Script Extension performing lateral movement*
+# *Detect process drops via Azure Custom Script Extension or Run Command performing lateral movement*
 
 ## Query Information
 
@@ -12,7 +12,7 @@
 
 
 #### Description
-This detection rule spots processes that where dropped via Azure Custom Script Extension on a machine and are now performing lateral movement. A common procedures for attackers when they compromised one machine is to move laterally to other machines via common protocols such as RDP, SSH, VNC, WMI, RPC, etc. It is not very common in an environment that Custom Script Extensions is being used for this. 
+This detection rule spots processes that were dropped via Azure Custom Script Extension or Run Command on a machine and are now performing lateral movement. A common procedures for attackers when they compromised one machine is to move laterally to other machines via common protocols such as RDP, SSH, VNC, WMI, RPC, etc. It is not very common in an environment that Custom Script Extensions is being used for this. 
 
 #### Risk
 This detection rule tries to mitigate the risk of Azure and Azure Arc being used to compromise servers and move laterally through the environment.
@@ -34,7 +34,7 @@ let process_drop_via_arc = (
     | where TimeGenerated > ago(7d)
     // Search for file created events by Arc Custom Script Handler
     | where ActionType == "FileCreated"
-    | where InitiatingProcessFileName =~ "customscripthandler.exe"
+    | where InitiatingProcessFileName =~ "customscripthandler.exe" or InitiatingProcessFileName =~ "runcommandhandler.exe"
     | where isnotempty(SHA256)
     | distinct SHA256
 );

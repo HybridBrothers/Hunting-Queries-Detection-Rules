@@ -1,4 +1,4 @@
-# *Detect executable drops via Azure custom script extension*
+# *Detect executable drops via Azure custom script extension for Windows*
 
 ## Query Information
 
@@ -34,7 +34,7 @@ DeviceFileEvents
 | where TimeGenerated > ago(1h)
 // Search for file created events by Arc Custom Script Handler
 | where ActionType == "FileCreated"
-| where InitiatingProcessFileName =~ "customscripthandler.exe"
+| where InitiatingProcessFileName =~ "customscripthandler.exe" or InitiatingProcessParentFileName =~ "customscripthandler.exe"
 // Get the file type
 | extend FileType = tostring(parse_json(AdditionalFields).FileType)
 // Flag on extension or executable file type
